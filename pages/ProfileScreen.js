@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, Alert, Image } from "react-native";
 import { Text } from "react-native-paper";
 import { useAuth } from "../AuthContext";
@@ -9,6 +9,30 @@ import Navbar from "../components/Navbar";
 const ProfileScreen = () => {
   const { userData } = useAuth();
   const navigation = useNavigation();
+  const [gameStats, setGameStats] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchGameStats = async () => {
+      try {
+        const response = await fetch(`https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/gamestats/user/${userData.userId}`);
+        const data = await response.json();
+
+        if (data.success) {
+          setGameStats(data.data);
+        } else {
+          Alert.alert("Error", data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        Alert.alert("Error", "Failed to fetch game statistics.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGameStats();
+  }, [userData.userId]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -18,7 +42,7 @@ const ProfileScreen = () => {
             <Image
               source={{
                 uri: userData?.avatar || "https://via.placeholder.com/100",
-              }} // Placeholder avatar
+              }}
               style={styles.avatar}
             />
             <Text style={styles.title}>Profile Information</Text>
@@ -42,7 +66,7 @@ const ProfileScreen = () => {
               <View style={styles.infoItem}>
                 <Ionicons name="star" size={24} color="#6A1B9A" />
                 <Text style={styles.label}>
-                  {userData?.premium ? "Premium User" : "Standart User"}
+                  {userData?.premium ? "Premium User" : "Standard User"}
                 </Text>
               </View>
               <View style={styles.infoItem}>
@@ -52,6 +76,24 @@ const ProfileScreen = () => {
                 </Text>
               </View>
             </View>
+          </View>
+
+          {/* Game Statistics Section */}
+          <View style={styles.statsCard}>
+            <Text style={styles.statsTitle}>Game Statistics</Text>
+            {loading ? (
+              <Text style={styles.loadingText}>Loading...</Text>
+            ) : gameStats.length > 0 ? (
+              gameStats.map((stat) => (
+                <View key={stat.gameStatId} style={styles.statItem}>
+                  <Ionicons name="game-controller" size={24} color="#6A1B9A" />
+                  <Text style={styles.statGameName}>{stat.gameName}</Text>
+                  <Text style={styles.statRank}>{stat.gameRank}</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.noStatsText}>No game statistics available.</Text>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -107,6 +149,51 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 10,
     fontWeight: "bold",
+  },
+  statsCard: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+    marginBottom: 20,
+  },
+  statsTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 15,
+  },
+  loadingText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#888",
+  },
+  noStatsText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#888",
+  },
+  statItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
+  statGameName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    flex: 1,
+    marginLeft: 10,
+  },
+  statRank: {
+    fontSize: 16,
+    color: "#555",
+    textAlign: "right",
   },
 });
 
