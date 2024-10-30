@@ -1,22 +1,24 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, Alert, Image } from 'react-native';
-import { Text } from 'react-native-paper'; 
-import { useAuth } from '../AuthContext'; 
-import { useNavigation } from '@react-navigation/native'; 
-import Ionicons from 'react-native-vector-icons/Ionicons'; 
-import Navbar from '../components/Navbar';
+import React from "react";
+import { View, StyleSheet, ScrollView, Alert, Image } from "react-native";
+import { Text } from "react-native-paper";
+import { useAuth } from "../AuthContext";
+import { useNavigation } from "@react-navigation/native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import Navbar from "../components/Navbar";
 
 const ProfileScreen = () => {
-  const { userData } = useAuth(); 
-  const navigation = useNavigation(); 
+  const { userData } = useAuth();
+  const navigation = useNavigation();
 
   return (
     <View style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.profileCard}>
-            <Image 
-              source={{ uri: userData?.avatar || 'https://via.placeholder.com/100' }} // Placeholder avatar
+            <Image
+              source={{
+                uri: userData?.avatar || "https://via.placeholder.com/100",
+              }} // Placeholder avatar
               style={styles.avatar}
             />
             <Text style={styles.title}>Profile Information</Text>
@@ -39,7 +41,15 @@ const ProfileScreen = () => {
               </View>
               <View style={styles.infoItem}>
                 <Ionicons name="star" size={24} color="#6A1B9A" />
-                <Text style={styles.label}>Premium: {userData?.premium ? 'Yes' : 'No'}</Text>
+                <Text style={styles.label}>
+                  {userData?.premium ? "Premium User" : "Standart User"}
+                </Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Ionicons name="globe" size={24} color="#6A1B9A" />
+                <Text style={styles.label}>
+                  {userData?.preferredLanguages?.join(", ")}
+                </Text>
               </View>
             </View>
           </View>
@@ -54,24 +64,24 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
   container: {
-    alignItems: 'center',
-    width: '100%',
+    alignItems: "center",
+    width: "100%",
   },
   profileCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
-    width: '100%',
-    shadowColor: '#000',
+    width: "100%",
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
     marginBottom: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   avatar: {
     width: 100,
@@ -81,22 +91,22 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   infoContainer: {
-    width: '100%',
+    width: "100%",
     marginTop: 10,
   },
   infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 5,
   },
   label: {
     fontSize: 16,
     marginLeft: 10,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

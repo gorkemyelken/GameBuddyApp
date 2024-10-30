@@ -109,9 +109,9 @@ const MatchScreen = () => {
           />
           <Text>Max Age: {ageRange[1]}</Text>
 
-          {!userData.premium ? (
-            <View style={styles.genderContainer}>
-              <Text style={styles.label}>Select Gender:</Text>
+          <View style={styles.genderContainer}>
+            <Text style={styles.label}>Select Gender:</Text>
+            {userData.premium ? (
               <View style={styles.checkboxContainer}>
                 {['MALE', 'FEMALE', 'OTHER'].map((gender) => (
                   <View key={gender} style={styles.checkboxOption}>
@@ -124,17 +124,16 @@ const MatchScreen = () => {
                   </View>
                 ))}
               </View>
-            </View>
-          ) : (
-            <View style={styles.nonPremiumGenderContainer}>
-              <Text style={styles.label}>Select Gender:</Text>
-              <View style={styles.lockedInfo}>
-                <Icon name="lock-closed-outline" size={20} color="#6A1B9A" />
-                <Text style={styles.lockedText}>For Only Premium Users</Text>
+            ) : (
+              <View style={styles.nonPremiumGenderContainer}>
+                <View style={styles.lockedInfo}>
+                  <Icon name="lock-closed-outline" size={20} color="#6A1B9A" />
+                  <Text style={styles.lockedText}>For Only Premium Users</Text>
+                </View>
+                <Text style={styles.radioLabel}>MALE, FEMALE, OTHER</Text>
               </View>
-              <Text style={styles.radioLabel}>MALE, FEMALE, OTHER</Text>
-            </View>
-          )}
+            )}
+          </View>
 
           <Text style={styles.label}>Select Game:</Text>
           <Picker
@@ -206,10 +205,12 @@ const styles = StyleSheet.create({
   genderContainer: {
     width: '100%',
     marginVertical: 10,
+    alignItems: 'center', // Center the contents
   },
   checkboxContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    width: '80%', // Ensure it fits within the container
   },
   checkboxOption: {
     flexDirection: 'row',
@@ -219,6 +220,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: '100%',
     padding: 10,
+    alignItems: 'center', // Center the contents
   },
   lockedInfo: {
     flexDirection: 'row',

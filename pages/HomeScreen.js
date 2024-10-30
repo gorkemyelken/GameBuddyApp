@@ -18,13 +18,13 @@ const HomeScreen = () => {
 
         <View style={styles.recentActivity}>
           <Text style={styles.sectionTitle}>Recent Activity</Text>
-          <Text style={styles.activityItem}>You matched with John Doe!</Text>
+          <Text style={styles.activityItem}>You matched with Gorkem!</Text>
           <Text style={styles.activityItem}>You played Fortnite on Oct 28.</Text>
         </View>
 
         <View style={styles.notifications}>
           <Text style={styles.sectionTitle}>Notifications</Text>
-          <Text style={styles.notificationItem}>You have a new message from Jane.</Text>
+          <Text style={styles.notificationItem}>You have a new message from Gorkem 2.</Text>
         </View>
       </ScrollView>
       <Navbar/>
