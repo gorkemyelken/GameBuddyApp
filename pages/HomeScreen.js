@@ -53,10 +53,10 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   sectionTitle: {
-    fontSize: 24, // Consistent font size
+    fontSize: 24, 
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#6A1B9A', // Match color theme
+    color: '#6A1B9A', 
   },
   featureItem: {
     fontSize: 16,
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   recentActivity: {
     marginVertical: 20,
     padding: 20,
-    backgroundColor: '#fff', // Match ProfileScreen
+    backgroundColor: '#fff', 
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: {
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   notifications: {
     marginVertical: 20,
     padding: 20,
-    backgroundColor: '#fff', // Match ProfileScreen
+    backgroundColor: '#fff', 
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: {

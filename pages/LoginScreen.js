@@ -3,12 +3,12 @@ import { View, StyleSheet, Image, Alert, ScrollView } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
-import { useAuth } from '../AuthContext'; // AuthContext'i içe aktar
+import { useAuth } from '../AuthContext'; 
 
 const LOGIN_API_URL = 'https://gamebuddy-auth-service-b40a307cb66b.herokuapp.com/api/v1/auth/login';
 
 const LoginScreen = ({ navigation }) => {
-  const { updateUserData } = useAuth(); // AuthContext'ten güncelleme fonksiyonunu al
+  const { updateUserData } = useAuth(); 
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,8 +23,8 @@ const LoginScreen = ({ navigation }) => {
       setLoading(true);
       const response = await axios.post(LOGIN_API_URL, { userName, password });
       if (response.data.success === true) {
-        updateUserData(response.data.data); // Kullanıcı verilerini güncelle
-        navigation.navigate('HomeScreen'); // Ana ekrana yönlendir
+        updateUserData(response.data.data); 
+        navigation.navigate('HomeScreen');
       } else {
         Alert.alert('Error', response.data.message);
       }

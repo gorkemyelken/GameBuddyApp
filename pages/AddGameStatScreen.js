@@ -1,4 +1,3 @@
-// AddGameStatScreen.js
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, Button, Alert } from "react-native";
 import { Picker } from '@react-native-picker/picker';
@@ -6,14 +5,14 @@ import { useAuth } from "../AuthContext";
 import { useNavigation } from "@react-navigation/native";
 
 const AddGameStatScreen = () => {
-  const { userData } = useAuth(); // Get user data from context
-  const navigation = useNavigation(); // Hook for navigation
+  const { userData } = useAuth(); 
+  const navigation = useNavigation(); 
   const [games, setGames] = useState([]);
   const [selectedGameId, setSelectedGameId] = useState(null);
   const [gameRank, setGameRank] = useState("");
   const [rankOptions, setRankOptions] = useState([]);
 
-  // Fetch games on component mount
+
   useEffect(() => {
     const fetchGames = async () => {
       try {
@@ -34,7 +33,6 @@ const AddGameStatScreen = () => {
     fetchGames();
   }, []);
 
-  // Update rank options when a game is selected
   const handleGameChange = (gameId) => {
     setSelectedGameId(gameId);
     const selectedGame = games.find((game) => game.gameId === gameId);
@@ -68,7 +66,7 @@ const AddGameStatScreen = () => {
 
       if (result.success) {
         Alert.alert("Success", "Game statistics added successfully!");
-        navigation.navigate('Profile'); // Navigate back to the ProfileScreen
+        navigation.navigate('Profile'); 
       } else {
         Alert.alert("Error", result.message);
       }

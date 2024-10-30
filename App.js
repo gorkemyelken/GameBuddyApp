@@ -41,7 +41,7 @@ export default function App() {
               name="Profile"
               component={ProfileScreen}
               options={{
-                headerBackVisible: false // Geri gelme butonunu kaldır
+                headerBackVisible: false 
               }}
             />
             <Stack.Screen

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, Alert, Image, Button } from "react-native";
 import { Text } from "react-native-paper";
 import { useAuth } from "../AuthContext";
-import { useNavigation, useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
+import { useNavigation, useFocusEffect } from "@react-navigation/native"; 
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Navbar from "../components/Navbar";
 
@@ -12,9 +12,8 @@ const ProfileScreen = () => {
   const [gameStats, setGameStats] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Function to fetch game statistics
   const fetchGameStats = async () => {
-    setLoading(true); // Start loading
+    setLoading(true); 
     try {
       const response = await fetch(`https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/gamestats/user/${userData.userId}`);
       const data = await response.json();
@@ -28,14 +27,13 @@ const ProfileScreen = () => {
       console.error(error);
       Alert.alert("Error", "Failed to fetch game statistics.");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false); 
     }
   };
 
-  // Use useFocusEffect to refetch game statistics when the screen is focused
   useFocusEffect(
     React.useCallback(() => {
-      fetchGameStats(); // Fetch game stats when screen is focused
+      fetchGameStats(); 
     }, [userData.userId])
   );
 
@@ -94,7 +92,6 @@ const ProfileScreen = () => {
   );
 };
 
-// Profile information item component
 const ProfileInfoItem = ({ icon, label }) => (
   <View style={styles.infoItem}>
     <Ionicons name={icon} size={24} color="#6A1B9A" />
@@ -102,7 +99,6 @@ const ProfileInfoItem = ({ icon, label }) => (
   </View>
 );
 
-// Game statistics item component
 const GameStatItem = ({ stat }) => (
   <View style={styles.statItem}>
     <Ionicons name="game-controller" size={24} color="#6A1B9A" />

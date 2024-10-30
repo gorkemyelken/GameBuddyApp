@@ -5,7 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../AuthContext';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/Ionicons'; // Import Ionicons for lock icon
+import Icon from 'react-native-vector-icons/Ionicons'; 
 
 const GAMES_API_URL = 'https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/games';
 const RANK_API_URL = (gameId) => `https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/games/${gameId}`;
@@ -76,7 +76,7 @@ const MatchScreen = () => {
     const criteria = {
       minAge: ageRange[0],
       maxAge: ageRange[1],
-      gender: userData.premium ? selectedGenders : ['MALE', 'FEMALE', 'OTHER'], // Default for non-premium users
+      gender: userData.premium ? selectedGenders : ['MALE', 'FEMALE', 'OTHER'], 
       gameId: selectedGame,
       selectedRanks: selectedRanks,
     };
@@ -205,12 +205,12 @@ const styles = StyleSheet.create({
   genderContainer: {
     width: '100%',
     marginVertical: 10,
-    alignItems: 'center', // Center the contents
+    alignItems: 'center',
   },
   checkboxContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '80%', // Ensure it fits within the container
+    width: '80%', 
   },
   checkboxOption: {
     flexDirection: 'row',
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: '100%',
     padding: 10,
-    alignItems: 'center', // Center the contents
+    alignItems: 'center', 
   },
   lockedInfo: {
     flexDirection: 'row',
