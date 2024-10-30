@@ -6,6 +6,7 @@ import LoginScreen from "./pages/LoginScreen";
 import RegisterScreen from "./pages/RegisterScreen";
 import ProfileScreen from "./pages/ProfileScreen";
 import { AuthProvider } from "./AuthContext";
+import MatchScreen from "./pages/MatchScreen";
 import HomeScreen from "./pages/HomeScreen";
 
 const Stack = createNativeStackNavigator();
@@ -27,15 +28,19 @@ export default function App() {
               options={{ headerShown: false }}
             />
                         <Stack.Screen
+              name="MatchScreen"
+              component={MatchScreen}
+            />
+            <Stack.Screen
               name="HomeScreen"
               component={HomeScreen}
-              options={{ headerShown: false }}
+              options={{headerShown: false }}
             />
             <Stack.Screen
               name="Profile"
               component={ProfileScreen}
               options={{
-                headerBackVisible: false, // Geri gelme butonunu kaldır
+                headerBackVisible: false // Geri gelme butonunu kaldır
               }}
             />
           </Stack.Navigator>

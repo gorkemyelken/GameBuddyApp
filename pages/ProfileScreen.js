@@ -1,21 +1,14 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, Alert, Image } from 'react-native';
-import { Text, Button } from 'react-native-paper'; 
+import { Text } from 'react-native-paper'; 
 import { useAuth } from '../AuthContext'; 
 import { useNavigation } from '@react-navigation/native'; 
 import Ionicons from 'react-native-vector-icons/Ionicons'; 
+import Navbar from '../components/Navbar';
 
 const ProfileScreen = () => {
   const { userData } = useAuth(); 
   const navigation = useNavigation(); 
-
-  // Function to handle logout
-  const handleLogout = () => {
-    // Implement your logout functionality here
-    Alert.alert('Logout', 'You have logged out successfully.', [
-      { text: 'OK', onPress: () => navigation.navigate('LoginScreen') }, // Navigate to Login screen
-    ]);
-  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -30,7 +23,7 @@ const ProfileScreen = () => {
             <View style={styles.infoContainer}>
               <View style={styles.infoItem}>
                 <Ionicons name="person" size={24} color="#6A1B9A" />
-                <Text style={styles.label}>{userData?.userName }</Text>
+                <Text style={styles.label}>{userData?.userName}</Text>
               </View>
               <View style={styles.infoItem}>
                 <Ionicons name="mail" size={24} color="#6A1B9A" />
@@ -50,17 +43,9 @@ const ProfileScreen = () => {
               </View>
             </View>
           </View>
-
-          {/* Logout button */}
-          <Button 
-            mode="contained" 
-            onPress={handleLogout} 
-            style={styles.logoutButton}
-          >
-            Logout
-          </Button>
         </View>
       </ScrollView>
+      <Navbar />
     </View>
   );
 };
@@ -112,11 +97,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 10,
     fontWeight: 'bold',
-  },
-  logoutButton: {
-    width: '100%',
-    marginTop: 20,
-    backgroundColor: '#6A1B9A',
   },
 });
 

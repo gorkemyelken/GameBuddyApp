@@ -1,28 +1,52 @@
+// components/Navbar.js
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { useAuth } from '../AuthContext'; // Assuming you have an AuthContext for user authentication
 
 const Navbar = () => {
   const navigation = useNavigation();
+  const { logout } = useAuth(); // Destructure the logout function from context
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to log out?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Logout", 
+          onPress: () => {
+            logout(); // Call the logout function from context
+            navigation.navigate('LoginScreen'); // Navigate to LoginScreen
+          } 
+        },
+      ]
+    );
+  };
 
   return (
     <View style={styles.navbar}>
-      <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
-        <Ionicons name="home" size={24} color="#6A1B9A" />
-        <Text style={styles.navText}>Home</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')} style={styles.button}>
+        <Icon name="home-outline" size={24} color="#fff" />
+        <Text style={styles.label}>Home</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
-        <Ionicons name="person" size={24} color="#6A1B9A" />
-        <Text style={styles.navText}>Profile</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.button}>
+        <Icon name="person-outline" size={24} color="#fff" />
+        <Text style={styles.label}>Profile</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('User List')}>
-        <Ionicons name="people" size={24} color="#6A1B9A" />
-        <Text style={styles.navText}>Users</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('MatchScreen')} style={styles.button}>
+        <Icon name="barcode-outline" size={24} color="#fff" />
+        <Text style={styles.label}>Match</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Game List')}>
-        <Ionicons name="game-controller" size={24} color="#6A1B9A" />
-        <Text style={styles.navText}>Games</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Friends')} style={styles.button}>
+        <Icon name="people-outline" size={24} color="#fff" />
+        <Text style={styles.label}>Friends</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleLogout} style={styles.button}>
+        <Icon name="log-out-outline" size={24} color="#fff" />
+        <Text style={styles.label}>Logout</Text>
       </TouchableOpacity>
     </View>
   );
@@ -32,20 +56,18 @@ const styles = StyleSheet.create({
   navbar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '100%',
+    alignItems: 'center',
     padding: 10,
-    backgroundColor: '#f8f8f8',
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-    position: 'absolute',
-    bottom: 0,
+    backgroundColor: '#6A1B9A', // Customize your navbar color
   },
-  navItem: {
+  button: {
+    flex: 1,
     alignItems: 'center',
   },
-  navText: {
-    fontSize: 12,
-    color: '#6A1B9A',
+  label: {
+    color: '#fff', // Text color
+    fontSize: 12, // Text size
+    marginTop: 4, // Space between icon and text
   },
 });
 
