@@ -1,128 +1,138 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, Image } from 'react-native';
-import { Button, TextInput } from 'react-native-paper';
-import { useAuth } from '../AuthContext'; // AuthContext'ten kullanıcı bilgilerini almak için hook'u kullan
+import { View, StyleSheet, Image, Alert, ScrollView } from 'react-native';
+import { TextInput, Button, Text } from 'react-native-paper';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import axios from 'axios';
+import { useAuth } from '../AuthContext'; // Import AuthContext
+
+const LOGIN_API_URL = 'https://gamebuddy-auth-service-b40a307cb66b.herokuapp.com/api/v1/auth/login';
 
 const LoginScreen = ({ navigation }) => {
+  const { updateUserData } = useAuth(); // Get the update function from AuthContext
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const { setUserData } = useAuth(); // AuthContext'ten setUserData'yı al
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    if (!userName || !password) {
+      Alert.alert('Error', 'Please enter your username and password.');
+      return;
+    }
+
     try {
-      const response = await fetch('https://gamebuddy-auth-service-b40a307cb66b.herokuapp.com/api/v1/auth/login', {
-        method: 'POST',
-        headers: {
-          'Accept': '*/*',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userName, password }),
-      });
+      setLoading(true);
+      const response = await axios.post(LOGIN_API_URL, { userName, password });
+      if (response.data.success === true) {
 
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('Login successful:', data);
-        setUserData(data); // Kullanıcı verilerini güncelle
-        navigation.navigate('Profile'); // ProfileScreen'e yönlendirme
+        // Store user data in AuthContext
+        updateUserData(response.data.data); // Save user data in AuthContext
+        
+        navigation.navigate('HomeScreen'); // Navigate to the home screen
       } else {
-        console.error('Login failed:', data);
-        setErrorMessage('Kullanıcı adı veya şifre yanlış');
+        Alert.alert('Error', response.data.message);
       }
     } catch (error) {
-      console.error('Error during login:', error);
-      setErrorMessage('Bir hata oluştu, lütfen tekrar deneyin');
+      Alert.alert('Error', 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleRegister = () => {
-    navigation.navigate('Register'); // Kayıt olma sayfasına yönlendir
-  };
-
   return (
-    <View style={styles.container}>
-      <Image 
-        source={{ uri: 'https://yyamimarlik.s3.eu-north-1.amazonaws.com/gamebuddy-logo.png' }}
-        style={styles.logo}
-      />
-      <Text style={styles.title}>GameBuddy</Text>
-      <TextInput
-        label="Kullanıcı Adı"
-        mode="outlined"
-        style={styles.input}
-        value={userName}
-        onChangeText={setUserName} // Kullanıcı adı için değişiklikleri kaydet
-      />
-      <TextInput
-        label="Şifre"
-        mode="outlined"
-        secureTextEntry
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword} // Şifre için değişiklikleri kaydet
-      />
-      {errorMessage ? (
-        <Text style={styles.error}>{errorMessage}</Text> // Hata mesajı
-      ) : null}
-      <Button 
-        mode="contained" 
-        onPress={handleLogin} 
-        style={styles.button}
-      >
-        Giriş Yap
-      </Button>
-      <Button 
-        mode="outlined" 
-        onPress={handleRegister} 
-        style={styles.button}
-      >
-        Kayıt Ol
-      </Button>
-      <Text style={styles.footer}>Created by Görkem Yelken</Text>
-    </View>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Image 
+          source={{ uri: 'https://yyamimarlik.s3.eu-north-1.amazonaws.com/gamebuddy-logo.png' }}
+          style={styles.logo} 
+        />
+
+        <View style={styles.inputContainer}>
+          <Ionicons name="person-outline" size={24} color="#6A1B9A" style={styles.icon} />
+          <TextInput
+            label="Username"
+            value={userName}
+            onChangeText={text => setUserName(text)}
+            mode="outlined"
+            style={styles.input}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Ionicons name="lock-closed-outline" size={24} color="#6A1B9A" style={styles.icon} />
+          <TextInput
+            label="Password"
+            value={password}
+            onChangeText={text => setPassword(text)}
+            mode="outlined"
+            secureTextEntry
+            style={styles.input}
+          />
+        </View>
+
+        <Button 
+          mode="contained" 
+          onPress={handleLogin} 
+          loading={loading}
+          style={styles.loginButton}
+          contentStyle={styles.buttonContent}
+        >
+          Log In
+        </Button>
+
+        <Button 
+          mode="text" 
+          onPress={() => navigation.navigate('RegisterScreen')} 
+          style={styles.registerButton}
+        >
+          Don't have an account? Register
+        </Button>
+        <Text style={styles.title}>Developed by Görkem Yelken.</Text>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
     padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  container: {
+    width: '100%',
+    alignItems: 'center',
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 150,
+    height: 150,
+    marginBottom: 30,
+    tintColor: '#6A1B9A',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
     marginBottom: 20,
   },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#6A1B9A',
-    backgroundColor: '#FFFFFF',
-    padding: 5,
-    textAlign: 'center',
-    marginBottom: 30,
+  icon: {
+    marginRight: 10,
   },
   input: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  loginButton: {
     width: '100%',
-    marginBottom: 10,
+    marginTop: 10,
+    backgroundColor: '#6A1B9A',
   },
-  button: {
-    width: '100%',
-    marginVertical: 10,
+  buttonContent: {
+    paddingVertical: 8,
   },
-  footer: {
-    marginTop: 20,
-    fontSize: 14,
-    color: '#888',
-  },
-  error: {
-    color: 'red',
-    marginBottom: 10,
-    textAlign: 'center',
+  registerButton: {
+    marginTop: 10,
   },
 });
 

@@ -1,150 +1,183 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, Alert } from 'react-native';
-import { Button, TextInput } from 'react-native-paper';
-import { Picker } from '@react-native-picker/picker';
-import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, Alert, Text, ScrollView } from 'react-native';
+import { TextInput, Button, RadioButton } from 'react-native-paper';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import axios from 'axios';
 
-const RegisterScreen = () => {
+const REGISTER_API_URL = 'https://gamebuddy-auth-service-b40a307cb66b.herokuapp.com/api/v1/auth/register';
+
+const RegisterScreen = ({ navigation }) => {
   const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [gender, setGender] = useState('');
   const [age, setAge] = useState('');
-  const [gender, setGender] = useState('MALE');
-  const navigation = useNavigation(); // Navigation hook
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (password !== confirmPassword) {
-      Alert.alert("Şifreler eşleşmiyor!", "Lütfen şifrelerinizi kontrol edin.");
+    if (!userName || !email || !password || !gender || !age) {
+      Alert.alert('Error', 'Please fill out all fields.');
       return;
     }
 
-    const userData = {
-      userName,
-      email,
-      password,
-      gender,
-      age: parseInt(age), // Yaşı sayıya dönüştür
-    };
-
     try {
-      const response = await fetch('https://gamebuddy-auth-service-b40a307cb66b.herokuapp.com/api/v1/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': '*/*',
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (response.ok) {
-        // Başarılı kayıt
-        Alert.alert("Kayıt başarılı!", "Giriş sayfasına yönlendiriliyorsunuz.");
-        navigation.navigate('Login'); // Giriş sayfasına yönlendir
-      } else {
-        const errorData = await response.json();
-        Alert.alert("Kayıt başarısız!", errorData.message || "Bir hata oluştu.");
+      setLoading(true);
+      const response = await axios.post(REGISTER_API_URL, { userName, email, password, gender, age });
+      if (response.data.success === true) {
+        Alert.alert('Success', response.data.message);
+        navigation.navigate('LoginScreen');
+      } if (response.data.success === false)  {
+        Alert.alert('Failed', response.data.message);
       }
     } catch (error) {
-      console.error(error);
-      Alert.alert("Hata!", "Kayıt işlemi sırasında bir hata oluştu.");
+      Alert.alert('Error', 'Registration failed. Please check your information.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Register</Text>
-      
-      <TextInput
-        label="Username"
-        mode="outlined"
-        style={styles.input}
-        value={userName}
-        onChangeText={setUserName}
-      />
-      <TextInput
-        label="Email"
-        mode="outlined"
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        label="Password"
-        mode="outlined"
-        secureTextEntry
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-      />
-      <TextInput
-        label="Confirm Password"
-        mode="outlined"
-        secureTextEntry
-        style={styles.input}
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
-      
-      <TextInput
-        label="Age"
-        mode="outlined"
-        keyboardType="numeric" // Sayı girişi için
-        style={styles.input}
-        value={age}
-        onChangeText={setAge}
-      />
-      
-      {/* Gender Picker at the bottom */}
-      <Picker
-        selectedValue={gender}
-        style={styles.picker}
-        onValueChange={(itemValue) => setGender(itemValue)}
-      >
-        <Picker.Item label="Male" value="MALE" />
-        <Picker.Item label="Female" value="FEMALE" />
-        <Picker.Item label="Other" value="OTHER" />
-      </Picker>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        
+        <View style={styles.inputContainer}>
+          <Ionicons name="person-outline" size={24} color="#6A1B9A" style={styles.icon} />
+          <TextInput
+            label="Username"
+            value={userName}
+            onChangeText={text => setUserName(text)}
+            mode="outlined"
+            style={styles.input}
+          />
+        </View>
 
-      <Button 
-        mode="contained" 
-        style={styles.button}
-        onPress={handleRegister} // Kayıt işlemini başlat
-      >
-        Register
-      </Button>
+        <View style={styles.inputContainer}>
+          <Ionicons name="mail-outline" size={24} color="#6A1B9A" style={styles.icon} />
+          <TextInput
+            label="Email"
+            value={email}
+            onChangeText={text => setEmail(text)}
+            mode="outlined"
+            keyboardType="email-address"
+            style={styles.input}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Ionicons name="lock-closed-outline" size={24} color="#6A1B9A" style={styles.icon} />
+          <TextInput
+            label="Password"
+            value={password}
+            onChangeText={text => setPassword(text)}
+            mode="outlined"
+            secureTextEntry
+            style={styles.input}
+          />
+        </View>
+
+        <View style={styles.radioContainer}>
+          <Text style={styles.radioLabel}>Gender</Text>
+          <RadioButton.Group onValueChange={value => setGender(value)} value={gender}>
+            <View style={styles.radioOption}>
+              <RadioButton value="MALE" color="#6A1B9A" />
+              <Text>Male</Text>
+            </View>
+            <View style={styles.radioOption}>
+              <RadioButton value="FEMALE" color="#6A1B9A" />
+              <Text>Female</Text>
+            </View>
+            <View style={styles.radioOption}>
+              <RadioButton value="OTHER" color="#6A1B9A" />
+              <Text>Other</Text>
+            </View>
+          </RadioButton.Group>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Ionicons name="calendar-outline" size={24} color="#6A1B9A" style={styles.icon} />
+          <TextInput
+            label="Age"
+            value={age}
+            onChangeText={text => setAge(text)}
+            mode="outlined"
+            keyboardType="numeric"
+            style={styles.input}
+          />
+        </View>
+
+        <Button 
+          mode="contained" 
+          onPress={handleRegister} 
+          loading={loading}
+          style={styles.registerButton}
+          contentStyle={styles.buttonContent}
+        >
+          Register
+        </Button>
+
+        <Button 
+          mode="text" 
+          onPress={() => navigation.navigate('LoginScreen')} 
+          style={styles.loginButton}
+        >
+          Already have an account? Log In
+        </Button>
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
     padding: 20,
+    backgroundColor: '#f5f5f5',
   },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#6A1B9A',
-    backgroundColor: '#FFFFFF',
-    padding: 5,
-    textAlign: 'center',
-    marginBottom: 30,
+  container: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 20,
+  },
+  icon: {
+    marginRight: 10,
   },
   input: {
-    width: '100%',
-    marginBottom: 10,
+    flex: 1,
+    backgroundColor: 'white',
   },
-  picker: {
+  radioContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     width: '100%',
-    marginBottom: 10,
+    marginBottom: 20,
   },
-  button: {
+  radioLabel: {
+    fontSize: 16,
+    marginRight: 10,
+  },
+  radioOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 20,
+  },
+  registerButton: {
     width: '100%',
-    marginVertical: 10,
+    marginTop: 10,
+    backgroundColor: '#6A1B9A',
+  },
+  buttonContent: {
+    paddingVertical: 8,
+  },
+  loginButton: {
+    marginTop: 10,
   },
 });
 
