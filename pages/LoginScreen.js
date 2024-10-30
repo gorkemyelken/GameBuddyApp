@@ -3,12 +3,12 @@ import { View, StyleSheet, Image, Alert, ScrollView } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
-import { useAuth } from '../AuthContext'; // Import AuthContext
+import { useAuth } from '../AuthContext'; // AuthContext'i içe aktar
 
 const LOGIN_API_URL = 'https://gamebuddy-auth-service-b40a307cb66b.herokuapp.com/api/v1/auth/login';
 
 const LoginScreen = ({ navigation }) => {
-  const { updateUserData } = useAuth(); // Get the update function from AuthContext
+  const { updateUserData } = useAuth(); // AuthContext'ten güncelleme fonksiyonunu al
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,11 +23,8 @@ const LoginScreen = ({ navigation }) => {
       setLoading(true);
       const response = await axios.post(LOGIN_API_URL, { userName, password });
       if (response.data.success === true) {
-
-        // Store user data in AuthContext
-        updateUserData(response.data.data); // Save user data in AuthContext
-        
-        navigation.navigate('HomeScreen'); // Navigate to the home screen
+        updateUserData(response.data.data); // Kullanıcı verilerini güncelle
+        navigation.navigate('HomeScreen'); // Ana ekrana yönlendir
       } else {
         Alert.alert('Error', response.data.message);
       }
@@ -45,7 +42,6 @@ const LoginScreen = ({ navigation }) => {
           source={{ uri: 'https://yyamimarlik.s3.eu-north-1.amazonaws.com/gamebuddy-logo.png' }}
           style={styles.logo} 
         />
-
         <View style={styles.inputContainer}>
           <Ionicons name="person-outline" size={24} color="#6A1B9A" style={styles.icon} />
           <TextInput
@@ -56,7 +52,6 @@ const LoginScreen = ({ navigation }) => {
             style={styles.input}
           />
         </View>
-
         <View style={styles.inputContainer}>
           <Ionicons name="lock-closed-outline" size={24} color="#6A1B9A" style={styles.icon} />
           <TextInput
@@ -68,7 +63,6 @@ const LoginScreen = ({ navigation }) => {
             style={styles.input}
           />
         </View>
-
         <Button 
           mode="contained" 
           onPress={handleLogin} 
@@ -78,7 +72,6 @@ const LoginScreen = ({ navigation }) => {
         >
           Log In
         </Button>
-
         <Button 
           mode="text" 
           onPress={() => navigation.navigate('RegisterScreen')} 

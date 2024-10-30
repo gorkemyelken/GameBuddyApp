@@ -23,7 +23,7 @@ const MatchScreen = () => {
     const fetchGames = async () => {
       try {
         const response = await axios.get(GAMES_API_URL);
-        setGames(response.data);
+        setGames(response.data.data);
       } catch (error) {
         Alert.alert('Error', 'Failed to fetch games.');
       }
@@ -35,7 +35,7 @@ const MatchScreen = () => {
     setSelectedGame(gameId);
     try {
       const response = await axios.get(RANK_API_URL(gameId));
-      setRanks(response.data.rankSystem);
+      setRanks(response.data.data.rankSystem);
       setSelectedRanks([]);
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch ranks for the selected game.');
@@ -143,7 +143,7 @@ const MatchScreen = () => {
           >
             <Picker.Item label="Select Game" value={null} />
             {games.map(game => (
-              <Picker.Item key={game.id} label={game.name} value={game.id} />
+              <Picker.Item key={game.gameId} label={game.name} value={game.gameId} />
             ))}
           </Picker>
 

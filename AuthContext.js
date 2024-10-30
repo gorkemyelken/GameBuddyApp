@@ -1,18 +1,16 @@
 import React, { createContext, useContext, useState } from 'react';
 
-// Auth bağlamını oluştur
 const AuthContext = createContext();
 
-// Auth sağlayıcısı
 export const AuthProvider = ({ children }) => {
-  const [userData, setUserData] = useState(null); // Başlangıçta kullanıcı verisi yok
+  const [userData, setUserData] = useState(null); 
 
   const updateUserData = (newData) => {
-    setUserData((prevData) => ({ ...prevData, ...newData })); // Kullanıcı verilerini güncelle
+    setUserData((prevData) => ({ ...prevData, ...newData })); 
   };
 
   const logout = () => {
-    setUserData(null); // Kullanıcıyı çıkış yaptır
+    setUserData(null); 
   };
 
   return (
@@ -22,7 +20,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Auth bağlamını kullanmak için özel bir hook
 export const useAuth = () => {
   return useContext(AuthContext);
 };

@@ -1,13 +1,12 @@
-// components/Navbar.js
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useAuth } from '../AuthContext'; // Assuming you have an AuthContext for user authentication
+import { useAuth } from '../AuthContext'; 
 
 const Navbar = () => {
   const navigation = useNavigation();
-  const { logout } = useAuth(); // Destructure the logout function from context
+  const { logout } = useAuth(); 
 
   const handleLogout = () => {
     Alert.alert(
@@ -18,8 +17,8 @@ const Navbar = () => {
         { 
           text: "Logout", 
           onPress: () => {
-            logout(); // Call the logout function from context
-            navigation.navigate('LoginScreen'); // Navigate to LoginScreen
+            navigation.navigate('LoginScreen'); 
+            logout();
           } 
         },
       ]
@@ -58,16 +57,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: '#6A1B9A', // Customize your navbar color
+    backgroundColor: '#6A1B9A', 
   },
   button: {
     flex: 1,
     alignItems: 'center',
   },
   label: {
-    color: '#fff', // Text color
-    fontSize: 12, // Text size
-    marginTop: 4, // Space between icon and text
+    color: '#fff', 
+    fontSize: 12, 
+    marginTop: 4, 
   },
 });
 

@@ -8,6 +8,7 @@ import ProfileScreen from "./pages/ProfileScreen";
 import { AuthProvider } from "./AuthContext";
 import MatchScreen from "./pages/MatchScreen";
 import HomeScreen from "./pages/HomeScreen";
+import AddGameStatScreen from "./pages/AddGameStatScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +43,11 @@ export default function App() {
               options={{
                 headerBackVisible: false // Geri gelme butonunu kaldır
               }}
+            />
+            <Stack.Screen
+              name="AddGameStatScreen"
+              component={AddGameStatScreen}
+              
             />
           </Stack.Navigator>
         </NavigationContainer>

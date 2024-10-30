@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, Alert, Image } from "react-native";
+import { View, StyleSheet, ScrollView, Alert, Image, Button } from "react-native";
 import { Text } from "react-native-paper";
 import { useAuth } from "../AuthContext";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Navbar from "../components/Navbar";
 
@@ -12,88 +12,80 @@ const ProfileScreen = () => {
   const [gameStats, setGameStats] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchGameStats = async () => {
-      try {
-        const response = await fetch(`https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/gamestats/user/${userData.userId}`);
-        const data = await response.json();
+  // Function to fetch game statistics
+  const fetchGameStats = async () => {
+    setLoading(true); // Start loading
+    try {
+      const response = await fetch(`https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/gamestats/user/${userData.userId}`);
+      const data = await response.json();
 
-        if (data.success) {
-          setGameStats(data.data);
-        } else {
-          Alert.alert("Error", data.message);
-        }
-      } catch (error) {
-        console.error(error);
-        Alert.alert("Error", "Failed to fetch game statistics.");
-      } finally {
-        setLoading(false);
+      if (data.success) {
+        setGameStats(data.data);
+      } else {
+        Alert.alert("Error", data.message);
       }
-    };
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Failed to fetch game statistics.");
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
 
-    fetchGameStats();
-  }, [userData.userId]);
+  // Use useFocusEffect to refetch game statistics when the screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchGameStats(); // Fetch game stats when screen is focused
+    }, [userData.userId])
+  );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
-          <View style={styles.profileCard}>
-            <Image
-              source={{
-                uri: userData?.avatar || "https://via.placeholder.com/100",
-              }}
-              style={styles.avatar}
+        <View style={styles.profileCard}>
+          <Image
+            source={{
+              uri: userData?.avatar || "https://via.placeholder.com/100",
+            }}
+            style={styles.avatar}
+          />
+          <Text style={styles.title}>Profile Information</Text>
+          <View style={styles.infoContainer}>
+            <ProfileInfoItem icon="person" label={userData?.userName} />
+            <ProfileInfoItem icon="mail" label={userData?.email} />
+            <ProfileInfoItem icon="calendar" label={userData?.age} />
+            <ProfileInfoItem icon="male-female" label={userData?.gender} />
+            <ProfileInfoItem
+              icon="star"
+              label={userData?.premium ? "Premium User" : "Standard User"}
             />
-            <Text style={styles.title}>Profile Information</Text>
-            <View style={styles.infoContainer}>
-              <View style={styles.infoItem}>
-                <Ionicons name="person" size={24} color="#6A1B9A" />
-                <Text style={styles.label}>{userData?.userName}</Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Ionicons name="mail" size={24} color="#6A1B9A" />
-                <Text style={styles.label}>{userData?.email}</Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Ionicons name="calendar" size={24} color="#6A1B9A" />
-                <Text style={styles.label}>{userData?.age}</Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Ionicons name="male-female" size={24} color="#6A1B9A" />
-                <Text style={styles.label}>{userData?.gender}</Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Ionicons name="star" size={24} color="#6A1B9A" />
-                <Text style={styles.label}>
-                  {userData?.premium ? "Premium User" : "Standard User"}
-                </Text>
-              </View>
-              <View style={styles.infoItem}>
-                <Ionicons name="globe" size={24} color="#6A1B9A" />
-                <Text style={styles.label}>
-                  {userData?.preferredLanguages?.join(", ")}
-                </Text>
-              </View>
-            </View>
+            <ProfileInfoItem
+              icon="globe"
+              label={userData?.preferredLanguages?.join(", ") || "N/A"}
+            />
           </View>
+        </View>
 
-          {/* Game Statistics Section */}
-          <View style={styles.statsCard}>
-            <Text style={styles.statsTitle}>Game Statistics</Text>
-            {loading ? (
-              <Text style={styles.loadingText}>Loading...</Text>
-            ) : gameStats.length > 0 ? (
-              gameStats.map((stat) => (
-                <View key={stat.gameStatId} style={styles.statItem}>
-                  <Ionicons name="game-controller" size={24} color="#6A1B9A" />
-                  <Text style={styles.statGameName}>{stat.gameName}</Text>
-                  <Text style={styles.statRank}>{stat.gameRank}</Text>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.noStatsText}>No game statistics available.</Text>
-            )}
+        {/* Game Statistics Section */}
+        <View style={styles.statsCard}>
+          <Text style={styles.statsTitle}>Game Statistics</Text>
+          {loading ? (
+            <Text style={styles.loadingText}>Loading...</Text>
+          ) : gameStats.length > 0 ? (
+            gameStats.map((stat) => (
+              <GameStatItem key={stat.gameStatId} stat={stat} />
+            ))
+          ) : (
+            <Text style={styles.noStatsText}>No game statistics available.</Text>
+          )}
+
+          {/* Add Game Stat Button */}
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Add Game"
+              onPress={() => navigation.navigate("AddGameStatScreen")}
+              color="#6A1B9A"
+            />
           </View>
         </View>
       </ScrollView>
@@ -102,21 +94,38 @@ const ProfileScreen = () => {
   );
 };
 
+// Profile information item component
+const ProfileInfoItem = ({ icon, label }) => (
+  <View style={styles.infoItem}>
+    <Ionicons name={icon} size={24} color="#6A1B9A" />
+    <Text style={styles.label}>{label}</Text>
+  </View>
+);
+
+// Game statistics item component
+const GameStatItem = ({ stat }) => (
+  <View style={styles.statItem}>
+    <Ionicons name="game-controller" size={24} color="#6A1B9A" />
+    <View style={styles.statTextContainer}>
+      <Text style={styles.statGameName}>{stat.gameName}</Text>
+      <Text style={styles.statRank}>{stat.gameRank}</Text>
+    </View>
+  </View>
+);
+
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+  },
   scrollContainer: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: "#f5f5f5",
-  },
-  container: {
-    alignItems: "center",
-    width: "100%",
   },
   profileCard: {
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
-    width: "100%",
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -154,7 +163,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
-    width: "100%",
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -180,20 +188,24 @@ const styles = StyleSheet.create({
   },
   statItem: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginVertical: 10,
+  },
+  statTextContainer: {
+    flexDirection: "column",
+    marginLeft: 10,
   },
   statGameName: {
     fontSize: 18,
     fontWeight: "bold",
-    flex: 1,
-    marginLeft: 10,
   },
   statRank: {
     fontSize: 16,
     color: "#555",
-    textAlign: "right",
+  },
+  buttonContainer: {
+    marginTop: 20,
+    alignItems: "center",
   },
 });
 
