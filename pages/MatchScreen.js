@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { Button, Text, Checkbox } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform, Modal } from 'react-native';
+import { Button, Text, Checkbox, Card, Avatar } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../AuthContext';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/Ionicons'; 
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const GAMES_API_URL = 'https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/games';
 const RANK_API_URL = (gameId) => `https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/games/${gameId}`;
 const MATCH_API_URL = 'https://gamebuddy-matchmaking-service-c814497a7748.herokuapp.com/api/v1/match-making';
+const USER_API_URL = (userId) => `https://gamebuddy-user-service-04b8e7746067.herokuapp.com/api/v1/users/${userId}`;
 
 const MatchScreen = () => {
   const { userData } = useAuth();
@@ -20,6 +21,8 @@ const MatchScreen = () => {
   const [ranks, setRanks] = useState([]);
   const [selectedRanks, setSelectedRanks] = useState([]);
   const [ratingRange, setRatingRange] = useState([1, 5]);
+  const [matchedUser, setMatchedUser] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -86,14 +89,22 @@ const MatchScreen = () => {
       maxRating: ratingRange[1],
     };
 
-    console.log('Match request criteria:', criteria);
-
     try {
       const response = await axios.post(MATCH_API_URL, criteria);
-      const { data } = response.data;
-      Alert.alert('Match Success', `Matched User: ${data.matchedUserIds[1]}`);
+      const matchedUserId = response.data.data.matchedUserIds[1];
+      fetchMatchedUserData(matchedUserId);
     } catch (error) {
       Alert.alert('Match Error', 'Failed to create match.');
+    }
+  };
+
+  const fetchMatchedUserData = async (userId) => {
+    try {
+      const response = await axios.get(USER_API_URL(userId));
+      setMatchedUser(response.data.data);
+      setModalVisible(true);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to fetch matched user profile.');
     }
   };
 
@@ -105,6 +116,7 @@ const MatchScreen = () => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
+          {/* Age Range Selector */}
           <Text style={styles.label}>Select Age Range:</Text>
           <Text>Min Age: {ageRange[0]}</Text>
           <MultiSlider
@@ -121,6 +133,7 @@ const MatchScreen = () => {
           />
           <Text>Max Age: {ageRange[1]}</Text>
 
+          {/* Gender Selector */}
           <View style={styles.genderContainer}>
             <Text style={styles.label}>Select Gender:</Text>
             {userData.premium ? (
@@ -147,14 +160,11 @@ const MatchScreen = () => {
             )}
           </View>
 
+          {/* Game and Rank Selectors */}
           <Text style={styles.label}>Select Game:</Text>
-          <Picker
-            selectedValue={selectedGame}
-            onValueChange={handleGameChange}
-            style={styles.dropdown}
-          >
+          <Picker selectedValue={selectedGame} onValueChange={handleGameChange} style={styles.dropdown}>
             <Picker.Item label="Select Game" value={null} />
-            {games.map(game => (
+            {games.map((game) => (
               <Picker.Item key={game.gameId} label={game.name} value={game.gameId} />
             ))}
           </Picker>
@@ -169,13 +179,13 @@ const MatchScreen = () => {
                 mode="dropdown"
               >
                 <Picker.Item label="Select Rank" value={null} />
-                {ranks.map(rank => (
+                {ranks.map((rank) => (
                   <Picker.Item key={rank} label={rank} value={rank} />
                 ))}
               </Picker>
               <View style={styles.selectedRanksContainer}>
                 <Text>Selected Ranks:</Text>
-                {selectedRanks.map(rank => (
+                {selectedRanks.map((rank) => (
                   <Text key={rank} style={styles.selectedRank}>
                     {rank}
                   </Text>
@@ -184,6 +194,7 @@ const MatchScreen = () => {
             </>
           )}
 
+          {/* Rating Range Selector */}
           <Text style={styles.label}>Select Rating Range:</Text>
           <Text>Min Rating: {ratingRange[0]}</Text>
           <MultiSlider
@@ -200,20 +211,52 @@ const MatchScreen = () => {
           />
           <Text>Max Rating: {ratingRange[1]}</Text>
 
+          {/* Match Button */}
           <View style={styles.matchButtonContainer}>
-            <Button 
-              mode="contained" 
-              onPress={handleMatch} 
-              style={styles.matchButton}
-            >
+            <Button mode="contained" onPress={handleMatch} style={styles.matchButton}>
               MATCH
             </Button>
           </View>
         </View>
+
+        {/* Matched User Modal */}
+        <Modal
+  visible={modalVisible}
+  animationType="slide"
+  onRequestClose={() => setModalVisible(false)}
+  transparent
+>
+  <View style={styles.modalBackground}>
+    <View style={styles.modalContainer}>
+      <Card>
+        <Card.Title
+          title={matchedUser?.userName || 'Unknown User'}
+          subtitle={`Age: ${matchedUser?.age || 'N/A'}`}
+          left={(props) => (
+            <Avatar.Image
+              {...props}
+              source={{ uri: matchedUser?.profilePhoto || 'default_image_url' }}
+            />
+          )}
+        />
+        <Card.Content>
+          <Text style={styles.label}>Bio:</Text>
+          <Text>{matchedUser?.bio || 'No bio available.'}</Text>
+
+        </Card.Content>
+        <Card.Actions>
+          <Button onPress={() => setModalVisible(false)}>Close</Button>
+        </Card.Actions>
+      </Card>
+    </View>
+  </View>
+</Modal>
+
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
+
 
 const styles = StyleSheet.create({
   scrollContainer: {
@@ -280,6 +323,18 @@ const styles = StyleSheet.create({
   },
   matchButton: {
     backgroundColor: '#6A1B9A',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    width: '90%',
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
   },
 });
 
