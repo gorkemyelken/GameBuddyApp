@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const GAMES_API_URL = 'https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/games';
 const RANK_API_URL = (gameId) => `https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/games/${gameId}`;
+const MATCH_API_URL = 'https://gamebuddy-matchmaking-service-c814497a7748.herokuapp.com/api/v1/match-making';
 
 const MatchScreen = () => {
   const { userData } = useAuth();
@@ -18,6 +19,7 @@ const MatchScreen = () => {
   const [selectedGame, setSelectedGame] = useState(null);
   const [ranks, setRanks] = useState([]);
   const [selectedRanks, setSelectedRanks] = useState([]);
+  const [ratingRange, setRatingRange] = useState([1, 5]);
 
   useEffect(() => {
     const fetchGames = async () => {
@@ -62,7 +64,7 @@ const MatchScreen = () => {
     });
   };
 
-  const handleMatch = () => {
+  const handleMatch = async () => {
     if (!ageRange[0] || !ageRange[1] || !selectedGame || selectedRanks.length === 0) {
       Alert.alert('Error', 'Please fill out all fields and select a game and at least one rank.');
       return;
@@ -74,15 +76,25 @@ const MatchScreen = () => {
     }
 
     const criteria = {
+      userId: userData.userId,
+      gameId: selectedGame,
+      preferredRanks: selectedRanks,
       minAge: ageRange[0],
       maxAge: ageRange[1],
-      gender: userData.premium ? selectedGenders : ['MALE', 'FEMALE', 'OTHER'], 
-      gameId: selectedGame,
-      selectedRanks: selectedRanks,
+      genders: userData.premium ? selectedGenders : ['MALE', 'FEMALE', 'OTHER'],
+      minRating: ratingRange[0],
+      maxRating: ratingRange[1],
     };
 
-    console.log('Matching criteria:', criteria);
-    Alert.alert('Match Criteria', JSON.stringify(criteria));
+    console.log('Match request criteria:', criteria);
+
+    try {
+      const response = await axios.post(MATCH_API_URL, criteria);
+      const { data } = response.data;
+      Alert.alert('Match Success', `Matched User: ${data.matchedUserIds[1]}`);
+    } catch (error) {
+      Alert.alert('Match Error', 'Failed to create match.');
+    }
   };
 
   return (
@@ -171,6 +183,22 @@ const MatchScreen = () => {
               </View>
             </>
           )}
+
+          <Text style={styles.label}>Select Rating Range:</Text>
+          <Text>Min Rating: {ratingRange[0]}</Text>
+          <MultiSlider
+            values={[ratingRange[0], ratingRange[1]]}
+            sliderLength={280}
+            onValuesChange={setRatingRange}
+            min={1}
+            max={5}
+            step={1}
+            selectedStyle={{ backgroundColor: '#6A1B9A' }}
+            unselectedStyle={{ backgroundColor: '#D1C4E9' }}
+            trackStyle={{ height: 5 }}
+            containerStyle={{ height: 40 }}
+          />
+          <Text>Max Rating: {ratingRange[1]}</Text>
 
           <View style={styles.matchButtonContainer}>
             <Button 
