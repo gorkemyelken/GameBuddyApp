@@ -66,7 +66,7 @@ const AddGameStatScreen = () => {
 
       if (result.success) {
         Alert.alert("Success", "Game statistics added successfully!");
-        navigation.navigate('Profile'); 
+        navigation.navigate('MyProfileScreen'); 
       } else {
         Alert.alert("Error", result.message);
       }
@@ -78,7 +78,6 @@ const AddGameStatScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add Game Statistics</Text>
       
       <Text style={styles.label}>Select Game:</Text>
       <Picker
@@ -105,7 +104,7 @@ const AddGameStatScreen = () => {
       </Picker>
 
       <View style={styles.buttonContainer}>
-        <Button title="Submit" onPress={handleAddStat} color="#6A1B9A" />
+        <Button title="Add" onPress={handleAddStat} color="#6A1B9A" />
       </View>
     </View>
   );

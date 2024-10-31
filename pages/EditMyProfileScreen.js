@@ -6,7 +6,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { useAuth } from "../AuthContext";
 import { useNavigation } from "@react-navigation/native";
 
-const EditProfileScreen = () => {
+const EditMyProfileScreen = () => {
   const { userData } = useAuth();
   const navigation = useNavigation();
 
@@ -74,7 +74,6 @@ const EditProfileScreen = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Edit Profile</Text>
 
         {/* Age Input */}
         <View style={styles.inputContainer}>
@@ -265,4 +264,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditProfileScreen;
+export default EditMyProfileScreen;

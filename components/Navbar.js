@@ -31,7 +31,7 @@ const Navbar = () => {
         <Icon name="home-outline" size={24} color="#fff" />
         <Text style={styles.label}>Home</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.button}>
+      <TouchableOpacity onPress={() => navigation.navigate('MyProfileScreen')} style={styles.button}>
         <Icon name="person-outline" size={24} color="#fff" />
         <Text style={styles.label}>Profile</Text>
       </TouchableOpacity>

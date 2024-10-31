@@ -4,12 +4,12 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./pages/LoginScreen";
 import RegisterScreen from "./pages/RegisterScreen";
-import ProfileScreen from "./pages/ProfileScreen";
 import { AuthProvider } from "./AuthContext";
 import MatchScreen from "./pages/MatchScreen";
 import HomeScreen from "./pages/HomeScreen";
 import AddGameStatScreen from "./pages/AddGameStatScreen";
-import EditProfileScreen from "./pages/EditProfileScreen";
+import MyProfileScreen from "./pages/MyProfileScreen";
+import EditMyProfileScreen from "./pages/EditMyProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -39,8 +39,8 @@ export default function App() {
               options={{headerShown: false }}
             />
             <Stack.Screen
-              name="Profile"
-              component={ProfileScreen}
+              name="MyProfileScreen"
+              component={MyProfileScreen}
               options={{
                 headerBackVisible: false 
               }}
@@ -51,8 +51,8 @@ export default function App() {
               
             />
             <Stack.Screen
-              name="EditProfileScreen"
-              component={EditProfileScreen}
+              name="EditMyProfileScreen"
+              component={EditMyProfileScreen}
               
             />
           </Stack.Navigator>
