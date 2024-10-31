@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ScrollView, Alert, TextInput, Button } from "react-native";
+import { View, StyleSheet, ScrollView, Alert, TextInput, Button, TouchableOpacity } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import { Text, Checkbox } from "react-native-paper";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -24,6 +24,10 @@ const EditProfileScreen = () => {
     if (!preferredLanguages.includes(language)) {
       setPreferredLanguages([...preferredLanguages, language]);
     }
+  };
+
+  const handleRemoveLanguage = (language) => {
+    setPreferredLanguages(preferredLanguages.filter(lang => lang !== language));
   };
 
   useEffect(() => {
@@ -159,9 +163,12 @@ const EditProfileScreen = () => {
         <View style={styles.selectedLanguagesContainer}>
           <Text>Selected Languages:</Text>
           {preferredLanguages.map((lang) => (
-            <Text key={lang} style={styles.selectedLanguage}>
-              {lang}
-            </Text>
+            <View key={lang} style={styles.selectedLanguageContainer}>
+              <Text style={styles.selectedLanguage}>{lang}</Text>
+              <TouchableOpacity onPress={() => handleRemoveLanguage(lang)}>
+                <Ionicons name="trash-bin" size={20} color="red" />
+              </TouchableOpacity>
+            </View>
           ))}
         </View>
 
@@ -242,6 +249,12 @@ const styles = StyleSheet.create({
   },
   selectedLanguagesContainer: {
     marginTop: 10,
+  },
+  selectedLanguageContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 5,
   },
   selectedLanguage: {
     fontSize: 16,

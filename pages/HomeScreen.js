@@ -14,6 +14,7 @@ const HomeScreen = () => {
           <Text style={styles.featureItem}>✨ Matchmaking improvements</Text>
           <Text style={styles.featureItem}>✨ Enhanced user profiles</Text>
           <Text style={styles.featureItem}>✨ New game integrations</Text>
+          <Text style={styles.featureItem}>✨ Voice Chat</Text>
         </View>
 
         <View style={styles.recentActivity}>

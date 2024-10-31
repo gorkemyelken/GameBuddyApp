@@ -14,10 +14,38 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import Navbar from "../components/Navbar";
 
 const ProfileScreen = () => {
-  const { userData } = useAuth();
+  const { userData, updateUserData } = useAuth();
   const navigation = useNavigation();
   const [gameStats, setGameStats] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const fetchUserData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://gamebuddy-user-service-04b8e7746067.herokuapp.com/api/v1/users/${userData.userId}`
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        updateUserData(data.data); // User data context'i güncelle
+      } else {
+        Alert.alert("Error", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      Alert.alert("Error", "Failed to fetch user data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserData();
+    }, [userData.userId])
+  );
+
 
   const fetchGameStats = async () => {
     setLoading(true);
@@ -46,6 +74,10 @@ const ProfileScreen = () => {
     }, [userData.userId])
   );
 
+  const genderIcon = userData?.gender === 'MALE' ? 'male' : 
+                   userData?.gender === 'FEMALE' ? 'female' : 
+                   'male-female'; 
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -60,15 +92,15 @@ const ProfileScreen = () => {
           <View style={styles.infoContainer}>
             <ProfileInfoItem icon="person" label={userData?.userName} />
             <ProfileInfoItem icon="mail" label={userData?.email} />
-            <ProfileInfoItem icon="calendar" label={userData?.age} />
-            <ProfileInfoItem icon="male-female" label={userData?.gender} />
+            <ProfileInfoItem icon="calendar" label={userData?.age || "Age undefined"} />
+            <ProfileInfoItem icon={genderIcon} label={userData?.gender || "Gender undefined"} />
             <ProfileInfoItem
               icon="star"
               label={userData?.premium ? "Premium User" : "Standard User"}
             />
             <ProfileInfoItem
               icon="globe"
-              label={userData?.preferredLanguages?.join(", ") || ""}
+              label={userData?.preferredLanguages?.join(", ") || "Preferred Languages undefined"}
             />
           </View>
           {/* Edit Profile Button */}
