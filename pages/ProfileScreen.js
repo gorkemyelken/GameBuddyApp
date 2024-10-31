@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, Alert, Image, Button } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Image,
+  Button,
+} from "react-native";
 import { Text } from "react-native-paper";
 import { useAuth } from "../AuthContext";
-import { useNavigation, useFocusEffect } from "@react-navigation/native"; 
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Navbar from "../components/Navbar";
 
@@ -13,9 +20,11 @@ const ProfileScreen = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchGameStats = async () => {
-    setLoading(true); 
+    setLoading(true);
     try {
-      const response = await fetch(`https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/gamestats/user/${userData.userId}`);
+      const response = await fetch(
+        `https://gamebuddy-game-service-1355a6fbfb17.herokuapp.com/api/v1/gamestats/user/${userData.userId}`
+      );
       const data = await response.json();
 
       if (data.success) {
@@ -27,13 +36,13 @@ const ProfileScreen = () => {
       console.error(error);
       Alert.alert("Error", "Failed to fetch game statistics.");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchGameStats(); 
+      fetchGameStats();
     }, [userData.userId])
   );
 
@@ -43,7 +52,7 @@ const ProfileScreen = () => {
         <View style={styles.profileCard}>
           <Image
             source={{
-              uri: userData?.avatar || "https://via.placeholder.com/100",
+              uri: userData?.profilePhoto || "https://via.placeholder.com/100",
             }}
             style={styles.avatar}
           />
@@ -59,7 +68,15 @@ const ProfileScreen = () => {
             />
             <ProfileInfoItem
               icon="globe"
-              label={userData?.preferredLanguages?.join(", ") || "N/A"}
+              label={userData?.preferredLanguages?.join(", ") || ""}
+            />
+          </View>
+          {/* Edit Profile Button */}
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Edit Profile"
+              onPress={() => navigation.navigate("EditProfileScreen")}
+              color="#6A1B9A"
             />
           </View>
         </View>
@@ -74,7 +91,9 @@ const ProfileScreen = () => {
               <GameStatItem key={stat.gameStatId} stat={stat} />
             ))
           ) : (
-            <Text style={styles.noStatsText}>No game statistics available.</Text>
+            <Text style={styles.noStatsText}>
+              No game statistics available.
+            </Text>
           )}
 
           {/* Add Game Stat Button */}

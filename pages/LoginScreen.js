@@ -23,6 +23,7 @@ const LoginScreen = ({ navigation }) => {
       setLoading(true);
       const response = await axios.post(LOGIN_API_URL, { userName, password });
       if (response.data.success === true) {
+        console.log(response.data.data)
         updateUserData(response.data.data); 
         navigation.navigate('HomeScreen');
       } else {

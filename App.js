@@ -9,6 +9,7 @@ import { AuthProvider } from "./AuthContext";
 import MatchScreen from "./pages/MatchScreen";
 import HomeScreen from "./pages/HomeScreen";
 import AddGameStatScreen from "./pages/AddGameStatScreen";
+import EditProfileScreen from "./pages/EditProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +48,11 @@ export default function App() {
             <Stack.Screen
               name="AddGameStatScreen"
               component={AddGameStatScreen}
+              
+            />
+            <Stack.Screen
+              name="EditProfileScreen"
+              component={EditProfileScreen}
               
             />
           </Stack.Navigator>
