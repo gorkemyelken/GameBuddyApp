@@ -10,6 +10,8 @@ import HomeScreen from "./pages/HomeScreen";
 import AddGameStatScreen from "./pages/AddGameStatScreen";
 import MyProfileScreen from "./pages/MyProfileScreen";
 import EditMyProfileScreen from "./pages/EditMyProfileScreen";
+import FriendsScreen from "./pages/FriendsScreen";
+import ChatScreen from "./pages/ChatScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -53,6 +55,16 @@ export default function App() {
             <Stack.Screen
               name="EditMyProfileScreen"
               component={EditMyProfileScreen}
+              
+            />
+                        <Stack.Screen
+              name="FriendsScreen"
+              component={FriendsScreen}
+              
+            />
+                                    <Stack.Screen
+              name="ChatScreen"
+              component={ChatScreen}
               
             />
           </Stack.Navigator>

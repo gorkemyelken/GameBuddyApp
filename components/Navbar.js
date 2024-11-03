@@ -39,7 +39,7 @@ const Navbar = () => {
         <Icon name="barcode-outline" size={24} color="#fff" />
         <Text style={styles.label}>Match</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Friends')} style={styles.button}>
+      <TouchableOpacity onPress={() => navigation.navigate('FriendsScreen')} style={styles.button}>
         <Icon name="people-outline" size={24} color="#fff" />
         <Text style={styles.label}>Friends</Text>
       </TouchableOpacity>
