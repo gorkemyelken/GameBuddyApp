@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, TextInput, Button, FlatList, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert } from "react-native";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useAuth } from "../AuthContext";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const SOCKET_URL = "https://gamebuddy-chat-service-446d857b5e76.herokuapp.com/ws-chat";
 const CONVERSATION_API_URL = "https://gamebuddy-chat-service-446d857b5e76.herokuapp.com/api/v1/conversations";
@@ -10,7 +11,7 @@ const MESSAGES_API_URL = "https://gamebuddy-chat-service-446d857b5e76.herokuapp.
 
 const ChatScreen = ({ route }) => {
     const { userData } = useAuth();
-    const { recipientId } = route.params;
+    const { recipientId, recipientName } = route.params;
     const [conversationId, setConversationId] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
@@ -18,7 +19,6 @@ const ChatScreen = ({ route }) => {
 
     const clientRef = useRef(null);
 
-    // Konuşmayı başlat veya mevcut konuşmayı bul
     useEffect(() => {
         fetch(`${CONVERSATION_API_URL}/getByUsers?user1Id=${userData.userId}&user2Id=${recipientId}`)
             .then((response) => response.json())
@@ -26,7 +26,6 @@ const ChatScreen = ({ route }) => {
                 if (data.success) {
                     setConversationId(data.data.conversationId);
 
-                    // Eğer conversationId varsa, eski mesajları al
                     fetch(`${MESSAGES_API_URL}/${data.data.conversationId}`)
                         .then((response) => response.json())
                         .then((data) => {
@@ -50,7 +49,6 @@ const ChatScreen = ({ route }) => {
                 console.log("Connected to WebSocket");
                 setIsConnected(true);
 
-                // Mesajları dinlemek için abone ol
                 stompClient.subscribe("/topic/public", (message) => {
                     const receivedMessage = JSON.parse(message.body);
 
@@ -103,40 +101,51 @@ const ChatScreen = ({ route }) => {
                 body: JSON.stringify(messagePayload),
             });
 
-            setMessages((prevMessages) => [
-                ...prevMessages,
-                { ...messagePayload },
-            ]);
-
             setNewMessage("");
         } else {
             Alert.alert("Error", "Conversation not found.");
         }
     };
 
+    const renderMessageItem = ({ item }) => {
+        const isMyMessage = item.senderId === userData.userId;
+        const isSystemMessage = item.content.startsWith("User joined") || item.content.startsWith("Welcome");
+
+        return (
+            <View style={isSystemMessage ? styles.systemMessageContainer : styles.messageWrapper}>
+                {!isSystemMessage && (
+                    <Text style={[styles.messageSender, isMyMessage ? styles.myMessageSender : styles.theirMessageSender]}>
+                        {isMyMessage ? userData.userName : recipientName}
+                    </Text>
+                )}
+                <View style={[styles.messageContainer, isMyMessage ? styles.myMessage : styles.theirMessage]}>
+                    <Text style={styles.messageContent}>{item.content}</Text>
+                </View>
+            </View>
+        );
+    };
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Chat with {recipientId}</Text>
-
+            <Text style={styles.title}>Chat with {recipientName}</Text>
             <FlatList
                 data={messages}
                 keyExtractor={(item) => item.messageId}
-                renderItem={({ item }) => (
-                    <View style={styles.messageContainer}>
-                        <Text style={styles.messageSender}>{item.senderId}:</Text>
-                        <Text style={styles.messageContent}>{item.content}</Text>
-                    </View>
-                )}
+                renderItem={renderMessageItem}
+                contentContainerStyle={styles.messagesList}
             />
 
-            <TextInput
-                style={styles.input}
-                placeholder="Type a message"
-                value={newMessage}
-                onChangeText={setNewMessage}
-            />
-
-            <Button title="Send Message" onPress={sendMessage} disabled={!isConnected} />
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Type a message"
+                    value={newMessage}
+                    onChangeText={setNewMessage}
+                />
+                <TouchableOpacity onPress={sendMessage} disabled={!isConnected || !newMessage.trim()}>
+                    <Ionicons name="send" size={24} color={isConnected ? "#6A1B9A" : "#ddd"} />
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -144,35 +153,76 @@ const ChatScreen = ({ route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: "#f5f5f5",
+        backgroundColor: "#e5e5e5",
     },
     title: {
         fontSize: 20,
         fontWeight: "bold",
-        marginBottom: 20,
-        textAlign: "center",
-    },
-    messageContainer: {
-        flexDirection: "row",
         marginBottom: 10,
-        padding: 10,
-        backgroundColor: "#e1e1e1",
-        borderRadius: 5,
+        textAlign: "center",
+        color: "#6A1B9A",
+    },
+    messagesList: {
+        paddingHorizontal: 10,
+        paddingVertical: 20,
+    },
+    messageWrapper: {
+        marginVertical: 8,
     },
     messageSender: {
         fontWeight: "bold",
-        marginRight: 5,
+        marginBottom: 3,
+        color: "#6A1B9A",
+    },
+    myMessageSender: {
+        alignSelf: "flex-end",
+    },
+    theirMessageSender: {
+        alignSelf: "flex-start",
+    },
+    messageContainer: {
+        padding: 10,
+        borderRadius: 15,
+        maxWidth: "80%",
+    },
+    myMessage: {
+        backgroundColor: "#E1D5F1",
+        alignSelf: "flex-end",
+        borderColor: "#6A1B9A",
+        borderWidth: 1,
+    },
+    theirMessage: {
+        backgroundColor: "#FFF",
+        alignSelf: "flex-start",
+        borderColor: "#6A1B9A",
+        borderWidth: 1,
+    },
+    systemMessageContainer: {
+        alignItems: "center",
+        marginVertical: 10,
     },
     messageContent: {
-        flexShrink: 1,
+        fontSize: 16,
+        color: "#333",
+    },
+    inputContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        borderTopWidth: 1,
+        borderTopColor: "#ddd",
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        backgroundColor: "#fff",
     },
     input: {
+        flex: 1,
         borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 5,
-        padding: 10,
-        marginBottom: 10,
+        borderColor: "#6A1B9A",
+        borderRadius: 20,
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        marginRight: 10,
+        backgroundColor: "#f9f9f9",
     },
 });
 

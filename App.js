@@ -12,6 +12,9 @@ import MyProfileScreen from "./pages/MyProfileScreen";
 import EditMyProfileScreen from "./pages/EditMyProfileScreen";
 import FriendsScreen from "./pages/FriendsScreen";
 import ChatScreen from "./pages/ChatScreen";
+import 'text-encoding-polyfill';
+import 'react-native-get-random-values';
+
 
 const Stack = createNativeStackNavigator();
 

@@ -43,8 +43,8 @@ const FriendsScreen = () => {
     fetchFriends();
   }, [userData.userId]);
 
-  const openChat = (friendId) => {
-    navigation.navigate("ChatScreen", { recipientId: friendId });
+  const openChat = (friendId, friendName) => {
+    navigation.navigate("ChatScreen", { recipientId: friendId, recipientName: friendName });
   };
 
   const renderFriendItem = ({ item }) => {
@@ -62,7 +62,7 @@ const FriendsScreen = () => {
             <Text>{item.preferredLanguages.join(", ")}</Text>
           </View>
         </View>
-        <TouchableOpacity onPress={() => openChat(item.userId)} style={styles.chatIconContainer}>
+        <TouchableOpacity onPress={() => openChat(item.userId, item.userName)} style={styles.chatIconContainer}>
           <Ionicons name="chatbubble-outline" size={24} color="#6A1B9A" />
         </TouchableOpacity>
       </View>
