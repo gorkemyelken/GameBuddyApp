@@ -1,12 +1,10 @@
 import React from 'react';
 import { View, StyleSheet, Text, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 
 const HomeScreen = () => {
-  const navigation = useNavigation();
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, paddingTop: 50 }}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.upcomingFeatures}>
           <Text style={styles.sectionTitle}>Upcoming Features</Text>
@@ -34,7 +32,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
-    padding: 20,
+    paddingHorizontal: 20,
     backgroundColor: '#f5f5f5',
   },
   upcomingFeatures: {

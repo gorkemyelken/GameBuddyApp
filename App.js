@@ -60,11 +60,11 @@ export default function App() {
             <Stack.Screen
               name="MyProfileScreen"
               component={MyProfileScreen}
-              options={{ headerBackVisible: false }}
+              options={{ headerShown: false }}
             />
             <Stack.Screen name="AddGameStatScreen" component={AddGameStatScreen} />
             <Stack.Screen name="EditMyProfileScreen" component={EditMyProfileScreen} />
-            <Stack.Screen name="FriendsScreen" component={FriendsScreen} />
+            <Stack.Screen name="FriendsScreen" component={FriendsScreen} options={{ headerShown: false }}/>
             <Stack.Screen name="ChatScreen" component={ChatScreen} />
           </Stack.Navigator>
           {/* Navbar'ı sayfa altında, yalnızca belirli ekranlarda göstermek için */}
