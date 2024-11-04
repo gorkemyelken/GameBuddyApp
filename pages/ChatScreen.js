@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert, Keyboard, Platform } from "react-native";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useAuth } from "../AuthContext";
@@ -18,6 +18,7 @@ const ChatScreen = ({ route }) => {
     const [isConnected, setIsConnected] = useState(false);
 
     const clientRef = useRef(null);
+    const flatListRef = useRef(null);
 
     useEffect(() => {
         fetch(`${CONVERSATION_API_URL}/getByUsers?user1Id=${userData.userId}&user2Id=${recipientId}`)
@@ -31,6 +32,7 @@ const ChatScreen = ({ route }) => {
                         .then((data) => {
                             if (data.success) {
                                 setMessages(data.data);
+                                flatListRef.current?.scrollToEnd({ animated: false });
                             }
                         })
                         .catch((error) => console.error("Eski mesajları yükleme hatası:", error));
@@ -62,6 +64,7 @@ const ChatScreen = ({ route }) => {
                         }
                         return prevMessages;
                     });
+                    flatListRef.current?.scrollToEnd({ animated: true });
                 });
 
                 stompClient.publish({
@@ -85,6 +88,16 @@ const ChatScreen = ({ route }) => {
             stompClient.deactivate();
         };
     }, [userData.userId]);
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+            flatListRef.current?.scrollToEnd({ animated: true });
+        });
+
+        return () => {
+            keyboardDidShowListener.remove();
+        };
+    }, []);
 
     const sendMessage = () => {
         if (clientRef.current && isConnected && newMessage.trim() !== "" && conversationId) {
@@ -129,6 +142,7 @@ const ChatScreen = ({ route }) => {
         <View style={styles.container}>
             <Text style={styles.title}>Chat with {recipientName}</Text>
             <FlatList
+                ref={flatListRef}
                 data={messages}
                 keyExtractor={(item) => item.messageId}
                 renderItem={renderMessageItem}
@@ -141,6 +155,7 @@ const ChatScreen = ({ route }) => {
                     placeholder="Type a message"
                     value={newMessage}
                     onChangeText={setNewMessage}
+                    onFocus={() => flatListRef.current?.scrollToEnd({ animated: true })}
                 />
                 <TouchableOpacity onPress={sendMessage} disabled={!isConnected || !newMessage.trim()}>
                     <Ionicons name="send" size={24} color={isConnected ? "#6A1B9A" : "#ddd"} />
