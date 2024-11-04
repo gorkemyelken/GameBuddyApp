@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert, Keyboard, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert, KeyboardAvoidingView, Platform, Keyboard } from "react-native";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useAuth } from "../AuthContext";
@@ -20,6 +20,7 @@ const ChatScreen = ({ route }) => {
     const clientRef = useRef(null);
     const flatListRef = useRef(null);
 
+    // Konuşmayı başlat veya mevcut konuşmayı bul
     useEffect(() => {
         fetch(`${CONVERSATION_API_URL}/getByUsers?user1Id=${userData.userId}&user2Id=${recipientId}`)
             .then((response) => response.json())
@@ -32,7 +33,6 @@ const ChatScreen = ({ route }) => {
                         .then((data) => {
                             if (data.success) {
                                 setMessages(data.data);
-                                flatListRef.current?.scrollToEnd({ animated: false });
                             }
                         })
                         .catch((error) => console.error("Eski mesajları yükleme hatası:", error));
@@ -64,7 +64,6 @@ const ChatScreen = ({ route }) => {
                         }
                         return prevMessages;
                     });
-                    flatListRef.current?.scrollToEnd({ animated: true });
                 });
 
                 stompClient.publish({
@@ -89,16 +88,6 @@ const ChatScreen = ({ route }) => {
         };
     }, [userData.userId]);
 
-    useEffect(() => {
-        const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
-            flatListRef.current?.scrollToEnd({ animated: true });
-        });
-
-        return () => {
-            keyboardDidShowListener.remove();
-        };
-    }, []);
-
     const sendMessage = () => {
         if (clientRef.current && isConnected && newMessage.trim() !== "" && conversationId) {
             const messagePayload = {
@@ -120,33 +109,38 @@ const ChatScreen = ({ route }) => {
         }
     };
 
-    const renderMessageItem = ({ item }) => {
-        const isMyMessage = item.senderId === userData.userId;
-        const isSystemMessage = item.content.startsWith("User joined") || item.content.startsWith("Welcome");
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+            setTimeout(() => {
+                flatListRef.current?.scrollToEnd({ animated: true });
+            }, 100); // Klavye açılınca `FlatList`'i en alta kaydırmak için biraz gecikme ekledik
+        });
 
-        return (
-            <View style={isSystemMessage ? styles.systemMessageContainer : styles.messageWrapper}>
-                {!isSystemMessage && (
-                    <Text style={[styles.messageSender, isMyMessage ? styles.myMessageSender : styles.theirMessageSender]}>
-                        {isMyMessage ? userData.userName : recipientName}
-                    </Text>
-                )}
-                <View style={[styles.messageContainer, isMyMessage ? styles.myMessage : styles.theirMessage]}>
-                    <Text style={styles.messageContent}>{item.content}</Text>
-                </View>
-            </View>
-        );
-    };
+        return () => {
+            keyboardDidShowListener.remove();
+        };
+    }, []);
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={90}
+        >
             <Text style={styles.title}>Chat with {recipientName}</Text>
             <FlatList
                 ref={flatListRef}
                 data={messages}
                 keyExtractor={(item) => item.messageId}
-                renderItem={renderMessageItem}
+                renderItem={({ item }) => (
+                    <View style={styles.messageContainer}>
+                        <View style={[styles.messageBubble, item.senderId === userData.userId ? styles.myMessage : styles.theirMessage]}>
+                            <Text style={styles.messageText}>{item.content}</Text>
+                        </View>
+                    </View>
+                )}
                 contentContainerStyle={styles.messagesList}
+                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
             />
 
             <View style={styles.inputContainer}>
@@ -155,13 +149,12 @@ const ChatScreen = ({ route }) => {
                     placeholder="Type a message"
                     value={newMessage}
                     onChangeText={setNewMessage}
-                    onFocus={() => flatListRef.current?.scrollToEnd({ animated: true })}
                 />
                 <TouchableOpacity onPress={sendMessage} disabled={!isConnected || !newMessage.trim()}>
                     <Ionicons name="send" size={24} color={isConnected ? "#6A1B9A" : "#ddd"} />
                 </TouchableOpacity>
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 
@@ -181,21 +174,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 20,
     },
-    messageWrapper: {
-        marginVertical: 8,
-    },
-    messageSender: {
-        fontWeight: "bold",
-        marginBottom: 3,
-        color: "#6A1B9A",
-    },
-    myMessageSender: {
-        alignSelf: "flex-end",
-    },
-    theirMessageSender: {
-        alignSelf: "flex-start",
-    },
     messageContainer: {
+        marginBottom: 10,
+    },
+    messageBubble: {
         padding: 10,
         borderRadius: 15,
         maxWidth: "80%",
@@ -212,11 +194,7 @@ const styles = StyleSheet.create({
         borderColor: "#6A1B9A",
         borderWidth: 1,
     },
-    systemMessageContainer: {
-        alignItems: "center",
-        marginVertical: 10,
-    },
-    messageContent: {
+    messageText: {
         fontSize: 16,
         color: "#333",
     },
