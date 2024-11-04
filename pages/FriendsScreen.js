@@ -6,11 +6,12 @@ import {
   Alert,
   FlatList,
   TouchableOpacity,
+  Text,
 } from "react-native";
-import { Text } from "react-native-paper";
 import { useAuth } from "../AuthContext";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import Navbar from "../components/Navbar";
 
 const FRIENDS_API_URL = "https://gamebuddy-user-service-04b8e7746067.herokuapp.com/api/v1/users/getFriends";
 
@@ -48,7 +49,8 @@ const FriendsScreen = () => {
   };
 
   const renderFriendItem = ({ item }) => {
-    const averageRating = item.averageRating || "N/A";
+    const averageRating = Math.round(item.averageRating * 2) / 2 || "-";
+
 
     return (
       <View style={styles.friendCard}>
@@ -78,8 +80,10 @@ const FriendsScreen = () => {
           data={friends}
           keyExtractor={(item) => item.userId}
           renderItem={renderFriendItem}
+          contentContainerStyle={styles.listContainer}
         />
       )}
+      <Navbar />
     </View>
   );
 };
@@ -88,7 +92,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",
-    padding: 20,
+  },
+  listContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 80,
   },
   friendCard: {
     flexDirection: "row",
