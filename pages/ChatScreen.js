@@ -20,7 +20,6 @@ const ChatScreen = ({ route }) => {
     const clientRef = useRef(null);
     const flatListRef = useRef(null);
 
-    // Konuşmayı başlat veya mevcut konuşmayı bul
     useEffect(() => {
         fetch(`${CONVERSATION_API_URL}/getByUsers?user1Id=${userData.userId}&user2Id=${recipientId}`)
             .then((response) => response.json())
@@ -113,7 +112,7 @@ const ChatScreen = ({ route }) => {
         const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
             setTimeout(() => {
                 flatListRef.current?.scrollToEnd({ animated: true });
-            }, 100); // Klavye açılınca `FlatList`'i en alta kaydırmak için biraz gecikme ekledik
+            }, 300); // Gecikmeyi artırdık
         });
 
         return () => {
@@ -140,7 +139,11 @@ const ChatScreen = ({ route }) => {
                     </View>
                 )}
                 contentContainerStyle={styles.messagesList}
-                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                onContentSizeChange={() =>
+                    setTimeout(() => {
+                        flatListRef.current?.scrollToEnd({ animated: true });
+                    }, 300) // Ekran açıldığında kaydırma için ek gecikme eklendi
+                }
             />
 
             <View style={styles.inputContainer}>
