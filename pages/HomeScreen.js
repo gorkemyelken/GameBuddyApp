@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Text, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Navbar from '../components/Navbar';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -28,7 +27,6 @@ const HomeScreen = () => {
           <Text style={styles.notificationItem}>You have a new message from Gorkem 2.</Text>
         </View>
       </ScrollView>
-      <Navbar/>
     </View>
   );
 };

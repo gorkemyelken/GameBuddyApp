@@ -179,7 +179,6 @@ const MyProfileScreen = () => {
           )}
         </View>
       </ScrollView>
-      <Navbar />
     </View>
   );
 };

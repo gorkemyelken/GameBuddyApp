@@ -83,7 +83,6 @@ const FriendsScreen = () => {
           contentContainerStyle={styles.listContainer}
         />
       )}
-      <Navbar />
     </View>
   );
 };
